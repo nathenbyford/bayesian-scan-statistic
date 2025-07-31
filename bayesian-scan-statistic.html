@@ -6,8 +6,8 @@
 <script src="bayesian-scan-statistic_files/libs/quarto-html/tippy.umd.min.js"></script>
 <link href="bayesian-scan-statistic_files/libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="bayesian-scan-statistic_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="bayesian-scan-statistic_files/libs/quarto-html/quarto-syntax-highlighting-549806ee2085284f45b00abea8c6df48.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.6.40">
+<link href="bayesian-scan-statistic_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.42">
 
   <meta name="author" content="">
   <meta name="dcterms.date" content="2025-08-14">
@@ -30,7 +30,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="bayesian-scan-statistic_files/libs/revealjs/dist/theme/quarto-072c70b6f5434f75ab3c746d51608093.css">
+  <link rel="stylesheet" href="bayesian-scan-statistic_files/libs/revealjs/dist/theme/quarto-008fd1a3f68f5987a57b997316f0b547.css">
   <link href="bayesian-scan-statistic_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="bayesian-scan-statistic_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="bayesian-scan-statistic_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -123,6 +123,9 @@
       margin-right: 0; 
     }
   </style>
+  <script src="bayesian-scan-statistic_files/libs/quarto-diagram/mermaid.min.js"></script>
+  <script src="bayesian-scan-statistic_files/libs/quarto-diagram/mermaid-init.js"></script>
+  <link href="bayesian-scan-statistic_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js" "=""></script>
   <script type="text/javascript">
     $(document).ready(function() {
@@ -170,6 +173,21 @@
 <li><a href="#/frequentist-spatial-scan-statistic" id="/toc-frequentist-spatial-scan-statistic">Frequentist Spatial Scan Statistic</a></li>
 <li><a href="#/bayesian-spatial-scan-statistics" id="/toc-bayesian-spatial-scan-statistics">Bayesian Spatial Scan Statistics</a></li>
 <li><a href="#/bayesian-interpretation" id="/toc-bayesian-interpretation">Bayesian Interpretation</a></li>
+<li><a href="#/scan-statistic-timeline" id="/toc-scan-statistic-timeline">Scan Statistic Timeline</a></li>
+</ul></li>
+<li><a href="#/proposed-method" id="/toc-proposed-method">Proposed method</a>
+<ul>
+<li><a href="#/accounting-for-under-reporting" id="/toc-accounting-for-under-reporting">Accounting for Under-reporting</a></li>
+<li><a href="#/model" id="/toc-model">Model</a></li>
+</ul></li>
+<li><a href="#/simulation-study" id="/toc-simulation-study">Simulation study</a>
+<ul>
+<li><a href="#/simulation-design" id="/toc-simulation-design">Simulation Design</a></li>
+<li><a href="#/simulation-metrics" id="/toc-simulation-metrics">Simulation Metrics</a></li>
+</ul></li>
+<li><a href="#/data-application" id="/toc-data-application">Data application</a>
+<ul>
+<li><a href="#/texas-covid-19-data" id="/toc-texas-covid-19-data">Texas COVID-19 Data</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -214,7 +232,7 @@ The systematic, ongoing assessment of the health of a community including the ti
 <p><strong>Novel disease monitoring</strong></p>
 </div>
 <div class="callout-content">
-<p>New diseases often lack reliable testing and reporting systems. Early cases may be missed or misclassified, obscuring disease surgeillance techniques that assume complete cases.</p>
+<p>New diseases often lack reliable testing and reporting systems. Early cases may be missed or misclassified, obscuring disease surveillance techniques that assume complete cases.</p>
 </div>
 </div>
 </div>
@@ -234,11 +252,11 @@ The systematic, ongoing assessment of the health of a community including the ti
 <h2>General Concept</h2>
 <div class="columns">
 <div class="column" style="width:'50%;">
-<p>Scan Statios</p>
+<p>Scan statistics</p>
 <ol type="1">
 <li>Select candidate regions</li>
 <li>calculate relative risk inside and outside of candidate region</li>
-<li>Determine region with largest effect size</li>
+<li>Determine region with largest risk ratio</li>
 </ol>
 </div><div class="column" style="width:'50%;">
 <div class="quarto-figure quarto-figure-center">
@@ -252,7 +270,7 @@ The systematic, ongoing assessment of the health of a community including the ti
 <section id="frequentist-spatial-scan-statistic" class="slide level2">
 <h2>Frequentist Spatial Scan Statistic</h2>
 <ul>
-<li>Likelihood ratio test</li>
+<li>Test statistic: Maximum likelihood ratio</li>
 <li>Monte-Carlo simulation to determine test statistic distribution</li>
 </ul>
 </section>
@@ -274,7 +292,7 @@ The systematic, ongoing assessment of the health of a community including the ti
 <tr class="odd">
 <td style="text-align: left;">1 to 3.2</td>
 <td style="text-align: left;">0 to 1.16</td>
-<td style="text-align: left;">Not Significcant</td>
+<td style="text-align: left;">Not Significant</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">3.2 to 10</td>
@@ -293,8 +311,74 @@ The systematic, ongoing assessment of the health of a community including the ti
 </tr>
 </tbody>
 </table>
+<aside><ol class="aside-footnotes"><li id="fn2"><p>Kass and Raftery (1995)</p></li></ol></aside></section>
+<section id="scan-statistic-timeline" class="slide level2">
+<h2>Scan Statistic Timeline</h2>
+<div class="cell" data-reveal="true" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">timeline
+    title Spatial Scan Statistic Development
+    1965 : Conceptual basis - Naus
+    1997 : Basic Spatial Scan Statistic (Frequentist)
+    1998 : Space-Time Extension (Frequentist)
+    2005 : Flexible Shapes (Frequentist)
+    2005 : Bayesian Spatial Scan Statistic
+    2007 : Multivariate Spatial Scan Statistic (Frequentist)
+    2012 : Overdispersed data extension (Frequentist) 
+    2017 : Bayesian Spatial Scan Statistic for Zero-inflated count data
+    2018 : Wald-based Spatial Scan Statistics (Frequentist)
+    2024 : Bayesian Spatial Scan Statistic for Multinormal data
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<ul>
+<li>Since the formalization in 1997 spatial scan statistics have been used and described as a method for epidemiologists</li>
+<li>No extension to account for under-reported count data</li>
+</ul>
+</section></section>
+<section>
+<section id="proposed-method" class="title-slide slide level1 center">
+<h1>Proposed method</h1>
 
-<aside><ol class="aside-footnotes"><li id="fn2"><p>Kass and Raftery (1995)</p></li></ol></aside></section></section>
+</section>
+<section id="accounting-for-under-reporting" class="slide level2">
+<h2>Accounting for Under-reporting</h2>
+</section>
+<section id="model" class="slide level2">
+<h2>Model</h2>
+</section></section>
+<section>
+<section id="simulation-study" class="title-slide slide level1 center">
+<h1>Simulation study</h1>
+
+</section>
+<section id="simulation-design" class="slide level2">
+<h2>Simulation Design</h2>
+</section>
+<section id="simulation-metrics" class="slide level2">
+<h2>Simulation Metrics</h2>
+<p>Even when the null hypothesis is correctly rejected, the detected clusters rarely match the true cluster exactly.</p>
+<p>To evaluate how well they overlap we will use:</p>
+<ul>
+<li><strong>Sensitivity:</strong> Proportion of true cases correctly included</li>
+<li><strong>Positive Predicted Value (PPV):</strong> Proportion of detected cases that are actually in the true cluster</li>
+</ul>
+</section></section>
+<section>
+<section id="data-application" class="title-slide slide level1 center">
+<h1>Data application</h1>
+
+</section>
+<section id="texas-covid-19-data" class="slide level2">
+<h2>Texas COVID-19 Data</h2>
+
+</section></section>
 
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
@@ -513,80 +597,42 @@ The systematic, ongoing assessment of the health of a community including the ti
       });
     </script>
     
-
     <script>
-
       // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-
       // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-
       // slide changes (different for each slide format).
-
       (function () {
-
         // dispatch for htmlwidgets
-
         function fireSlideEnter() {
-
           const event = window.document.createEvent("Event");
-
           event.initEvent("slideenter", true, true);
-
           window.document.dispatchEvent(event);
-
         }
-
-    
 
         function fireSlideChanged(previousSlide, currentSlide) {
-
           fireSlideEnter();
 
-    
-
           // dispatch for shiny
-
           if (window.jQuery) {
-
             if (previousSlide) {
-
               window.jQuery(previousSlide).trigger("hidden");
-
             }
-
             if (currentSlide) {
-
               window.jQuery(currentSlide).trigger("shown");
-
             }
-
           }
-
         }
-
-    
 
         // hookup for slidy
-
         if (window.w3c_slidy) {
-
           window.w3c_slidy.add_observer(function (slide_num) {
-
             // slide_num starts at position 1
-
             fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-
           });
-
         }
 
-    
-
       })();
-
     </script>
-
-    
 
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {

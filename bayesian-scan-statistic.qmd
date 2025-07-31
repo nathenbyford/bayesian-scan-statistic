@@ -14,7 +14,7 @@ format:
 
 # Load packages
 library(tidyverse)
-
+library(ggforce)
 
 ```
 
@@ -42,7 +42,7 @@ A subset of disease surveillance methods focus on disease progression and outbre
 :::{.callout-warning}
 ## Novel disease monitoring
 
-New diseases often lack reliable testing and reporting systems. Early cases may be missed or misclassified, obscuring disease surgeillance techniques that assume complete cases.
+New diseases often lack reliable testing and reporting systems. Early cases may be missed or misclassified, obscuring disease surveillance techniques that assume complete cases.
 :::
 
 Examples
@@ -71,9 +71,10 @@ Scan statistics
 :::
 ::::
 
+
 ## Frequentist Spatial Scan Statistic
 
-- Likelihood ratio test
+- Test statistic: Maximum likelihood ratio
 - Monte-Carlo simulation to determine test statistic distribution
 
 ## Bayesian Spatial Scan Statistics
@@ -84,14 +85,53 @@ table: Interpretation of Bayes factor[^2]
 
 | BF        | Log(BF)      | Strength of evidence $H_0$ |
 |:----------|:-------------|:---------------------------|
-| 1 to 3.2  | 0 to 1.16    | Not Significcant           |
+| 1 to 3.2  | 0 to 1.16    | Not Significant            |
 | 3.2 to 10 | 1.16 to 2.30 | Positive                   |
 | 10 to 100 | 2.30 to 4.61 | Strong                     |
 | $>$ 100   | $> 4.61$     | Decisive                   |
 
 [^2]: Kass and Raftery (1995) 
 
+## Scan Statistic Timeline
+
+```{mermaid}
+timeline
+    title Spatial Scan Statistic Development
+    1965 : Conceptual basis - Naus
+    1997 : Basic Spatial Scan Statistic (Frequentist)
+    1998 : Space-Time Extension (Frequentist)
+    2005 : Flexible Shapes (Frequentist)
+    2005 : Bayesian Spatial Scan Statistic
+    2007 : Multivariate Spatial Scan Statistic (Frequentist)
+    2012 : Overdispersed data extension (Frequentist) 
+    2017 : Bayesian Spatial Scan Statistic for Zero-inflated count data
+    2018 : Wald-based Spatial Scan Statistics (Frequentist)
+    2024 : Bayesian Spatial Scan Statistic for Multinormal data
+```
+
+- Since the formalization in 1997 spatial scan statistics have been used and described as a method for epidemiologists
+- No extension to account for under-reported count data
+
 # Proposed method
 
 ## Accounting for Under-reporting
 
+## Model
+
+# Simulation study
+
+## Simulation Design
+
+## Simulation Metrics
+
+Even when the null hypothesis is correctly rejected, the detected clusters rarely match the true cluster exactly.
+
+To evaluate how well they overlap we will use:
+
+- **Sensitivity:** Proportion of true cases correctly included
+- **Positive Predicted Value (PPV):** Proportion of detected cases that are actually in the true cluster
+
+
+# Data application
+
+## Texas COVID-19 Data 

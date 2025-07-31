@@ -37,7 +37,7 @@ highlight_data <- lapply(1:nrow(tx_counties), function(i) {
   frame_data <- tx_counties[c(i, neighbors), ]
   frame_data$frame <- i  # animation frame = focal county index
   frame_data$highlight <- ifelse(frame_data$county_id == i, "focal", "neighbor")
-  frame_data$county_name <- tx_counties$county_name[i]  # add name for title
+  frame_data$focal_name <- frame_data$NAME[i]  # add name for title
   frame_data
 })
 
