@@ -1,29 +1,97 @@
 ---
-title: 'Title'
-date: ''
+title: 'A Bayesian Spatial Scan Statistic for Under-reported Data'
+date: 8-14-2025
+date-format: long
 format: 
   baylor_theme-revealjs:
-    author: 'Author'
-    footer: 'Author'
+    author: ' '
+    footer: 'Nathen Byford'
+    self-contain: true
+    toc: true
 ---
-
-## Quarto
-
-Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
-
-## Bullets
-
-When you click the **Render** button a document will be generated that includes:
-
--   Content authored with markdown
--   Output from executable code
-
-# Code
-
-## Basic code
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
-
 ```{r}
-1 + 1
+#| include: false
+
+# Load packages
+library(tidyverse)
+
+
 ```
+
+# Introduction
+
+## Public Health Surveillance {.smaller}
+
+:::{.columns}
+::::{.column width=50%}
+![](images/wmr2015_changesinincidence.png){width='80%' fig-align='center'}
+::::
+::::{.column width=50%}
+![](images/COVID19_TimeSeries.jpg){width='65%' fig-align='center'}
+::::
+:::
+Public health surveillance 
+: The systematic, ongoing assessment of the health of a community including the timely collection, analysis, interpretation, dissemination and subsequent use of data. [^1]
+
+[^1]: Teutsch, Steven M. and Churchill, R. Elliott "Principles and practice of public health surveillance"  (1992)
+
+## Motivation
+
+A subset of disease surveillance methods focus on disease progression and outbreak detection.
+
+:::{.callout-warning}
+## Novel disease monitoring
+
+New diseases often lack reliable testing and reporting systems. Early cases may be missed or misclassified, obscuring disease surgeillance techniques that assume complete cases.
+:::
+
+Examples
+
+- COVID-19
+- HIV/AIDS
+- Tuberculosis (TB)
+
+# Spatial Scan Statistics
+
+## General Concept
+
+::::{.columns}
+:::{.column width='50%}
+
+Scan statistics
+
+1. Select candidate regions
+2. calculate relative risk inside and outside of candidate region
+3. Determine region with largest risk ratio
+
+:::
+:::{.column width='50%}
+
+![Visualization of Spatial Scan Regions](images/texas_scan.gif){width=80%}
+:::
+::::
+
+## Frequentist Spatial Scan Statistic
+
+- Likelihood ratio test
+- Monte-Carlo simulation to determine test statistic distribution
+
+## Bayesian Spatial Scan Statistics
+
+## Bayesian Interpretation
+
+table: Interpretation of Bayes factor[^2]
+
+| BF        | Log(BF)      | Strength of evidence $H_0$ |
+|:----------|:-------------|:---------------------------|
+| 1 to 3.2  | 0 to 1.16    | Not Significcant           |
+| 3.2 to 10 | 1.16 to 2.30 | Positive                   |
+| 10 to 100 | 2.30 to 4.61 | Strong                     |
+| $>$ 100   | $> 4.61$     | Decisive                   |
+
+[^2]: Kass and Raftery (1995) 
+
+# Proposed method
+
+## Accounting for Under-reporting
+
