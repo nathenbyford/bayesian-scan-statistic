@@ -1,0 +1,340 @@
+---
+title: 'A Bayesian Spatial Scan Statistic for Under-reported Data'
+date: 8-14-2025
+date-format: long
+format: 
+  baylor_theme-revealjs:
+    author: ' '
+    footer: 'Nathen Byford'
+    self-contain: true
+    toc: true
+    toc-depth: 1
+    callout-appearance: simple
+---
+
+```{r}
+#| include: false
+
+# Load packages
+library(tidyverse)
+library(ggforce)
+
+```
+
+
+
+# Introduction
+
+## Public Health Surveillance {.smaller}
+
+:::{.columns}
+::::{.column width=50%}
+![](images/wmr2015_changesinincidence.png){width='80%' fig-align='center'}
+::::
+::::{.column width=50%}
+![](images/COVID19_TimeSeries.jpg){width='65%' fig-align='center'}
+::::
+:::
+Public health surveillance 
+: The systematic, ongoing assessment of the health of a community including the timely collection, analysis, interpretation, dissemination and subsequent use of data. [^1]
+
+[^1]: Teutsch, Steven M. and Churchill, R. Elliott "Principles and practice of public health surveillance"  (1992)
+
+## Motivation
+
+A subset of disease surveillance methods focus on disease progression and outbreak detection.
+
+:::{.callout-warning}
+## Novel disease monitoring
+
+New diseases often lack reliable testing and reporting systems. Early cases may be missed or misclassified, obscuring disease surveillance techniques that assume complete cases.
+:::
+
+Examples
+
+- COVID-19
+- HIV/AIDS
+- Tuberculosis (TB)
+
+# Spatial Scan Statistics
+
+## General Concept
+
+::::{.columns}
+:::{.column width='50%}
+
+Scan statistics
+
+1. Select candidate regions
+2. Calculate relative risk inside and outside of candidate region
+3. Determine region with largest difference
+
+:::
+:::{.column width='50%}
+
+![Visualization of Spatial Scan Regions](images/texas_scan.gif){width=80%}
+:::
+::::
+
+
+## Frequentist Spatial Scan Statistic {.smaller}
+
+- Suppose we observe counts $z_i$ and have baselines $b_i$ for regions $i = 1, \ldots, n$.
+- Using the likelihood function $g(\cdot)$ parameterized by a rate or probability
+
+$$ 
+H_0: \text{No cluster (common rate for all regions)}  \\
+H_1(S): \text{Cluster in subset }S\text{ with elevated rate vs. outside } S 
+$$
+
+- Compute likelihood ratio test statistic for each candidate zone $S$
+- The scan statistic test statistic is $\Lambda = \max_{S \in C}\lambda(S)$.
+- Generate Monte Carlo samples under $H_0$ to calculate P-value 
+
+## Bayesian Spatial Scan Statistics
+
+
+
+## Bayesian Interpretation
+
+table: Interpretation of Bayes factor[^2]
+
+| BF        | Log(BF)      | Strength of evidence $H_0$ |
+|:----------|:-------------|:---------------------------|
+| 1 to 3.2  | 0 to 1.16    | Not Significant            |
+| 3.2 to 10 | 1.16 to 2.30 | Positive                   |
+| 10 to 100 | 2.30 to 4.61 | Strong                     |
+| $>$ 100   | $> 4.61$     | Decisive                   |
+
+[^2]: Kass and Raftery (1995) 
+
+## Scan Statistic Timeline
+
+
+
+```{mermaid}
+timeline
+    title Spatial Scan Statistic Development
+    1965 : Conceptual basis - Naus
+    1997 : Basic Spatial Scan Statistic (Frequentist)
+    1998 : Space-Time Extension (Frequentist)
+    2005 : Flexible Shapes (Frequentist)
+    2005 : Bayesian Spatial Scan Statistic
+    2007 : Multivariate Spatial Scan Statistic (Frequentist)
+    2012 : Overdispersed data extension (Frequentist) 
+    2017 : Bayesian Spatial Scan Statistic for Zero-inflated count data
+    2018 : Wald-based Spatial Scan Statistics (Frequentist)
+    2024 : Bayesian Spatial Scan Statistic for Multinormal data
+```
+
+
+
+- Since the formalization in 1997 spatial scan statistics have been used and described as a method for epidemiologists
+- No extension to account for under-reported count data
+
+# Proposed Method
+
+## Accounting for Under-reporting
+
+Most methods proposed for modeling under-reported or misclassified data fall into two categories:
+
+1. Double sampling
+2. latent variable models
+
+## Model
+
+We propose a novel Bayesian spatial scan statistic model by modeling the true counts as a latent variable and introducing reporting probability $p$.
+
+## Setting Priors
+
+# Simulation Study
+
+## Simulation Design
+
+## Simulation Metrics
+
+Even when the null hypothesis is correctly rejected, the detected clusters rarely match the true cluster exactly.
+
+To evaluate how well they overlap we will use:
+
+- **Sensitivity:** Proportion of true cases correctly included
+- **Positive Predicted Value (PPV):** Proportion of detected cases that are actually in the true cluster
+
+## Simulation Results
+
+
+
+```{r}
+library(gt)
+
+# Recreate data frame
+df <- tribble(
+  ~Reporting, ~q_in, ~Naive_Power, ~Naive_Sens, ~Naive_PPV,
+  ~BUSSS_Power, ~BUSSS_Sens, ~BUSSS_PPV,
+  0.1, 2.15, 0.08, 0.25, 0.24, 0.20, 0.63, 0.55,
+  0.2, 2.15, 0.14, 0.53, 0.43, 0.33, 0.94, 0.79,
+  0.3, 2.15, 0.31, 0.72, 0.60, 0.50, 0.99, 0.83,
+  0.1, 2.20, 0.18, 0.43, 0.38, 0.43, 0.91, 0.82,
+  0.2, 2.20, 0.34, 0.70, 0.59, 0.49, 0.97, 0.84,
+  0.3, 2.20, 0.42, 0.85, 0.70, 0.58, 1.00, 0.85,
+  0.1, 2.25, 0.26, 0.65, 0.55, 0.42, 0.90, 0.80,
+  0.2, 2.25, 0.48, 0.79, 0.68, 0.70, 0.99, 0.90,
+  0.6, 2.25, 0.76, 0.93, 0.91, 0.80, 1.00, 0.92,
+  1.0, 2.25, 0.86, 1.00, 0.94, 0.86, 1.00, 0.94,
+  0.1, 2.30, 0.50, 0.86, 0.76, 0.58, 1.00, 0.85,
+  0.2, 2.30, 0.54, 0.86, 0.74, 0.68, 1.00, 0.88,
+  0.3, 2.30, 0.74, 0.99, 0.90, 0.74, 1.00, 0.90,
+  0.4, 2.30, 0.68, 1.00, 0.88, 0.80, 1.00, 0.92,
+  0.5, 2.30, 0.84, 0.99, 0.95, 0.86, 1.00, 0.95,
+  0.1, 3.00, 0.90, 1.00, 0.90, 0.90, 1.00, 0.90,
+  0.1, 5.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00
+)
+
+df %>%
+  gt() %>%
+  tab_spanner(
+    label = "Naive BSSS",
+    columns = c(Naive_Power, Naive_Sens, Naive_PPV)
+  ) %>%
+  tab_spanner(
+    label = "BUSSS",
+    columns = c(BUSSS_Power, BUSSS_Sens, BUSSS_PPV)
+  ) %>%
+  cols_label(
+    Reporting = "Reporting",
+    q_in = html("q<sub>in</sub>"),
+    Naive_Power = "Power",
+    Naive_Sens = "Sensitivity",
+    Naive_PPV = "PPV",
+    BUSSS_Power = "Power",
+    BUSSS_Sens = "Sensitivity",
+    BUSSS_PPV = "PPV"
+  ) %>%
+  tab_row_group(
+    group = "q_in = 2.15", rows = q_in == 2.15
+  ) %>%
+  tab_row_group(
+    group = "q_in = 2.20", rows = q_in == 2.20
+  ) %>%
+  tab_row_group(
+    group = "q_in = 2.25", rows = q_in == 2.25
+  ) %>%
+  tab_row_group(
+    group = "q_in = 2.30", rows = q_in == 2.30
+  ) %>%
+  tab_row_group(
+    group = "q_in = 3.00", rows = q_in == 3.00
+  ) %>%
+  tab_row_group(
+    group = "q_in = 5.00", rows = q_in == 5.00
+  ) 
+
+```
+
+
+
+## Simulation Results Visual
+
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+# Reshape data to long format
+df_long <- df %>%
+  pivot_longer(
+    cols = -c(Reporting, q_in),
+    names_to = c("Method", "Metric"),
+    names_pattern = "(Naive|BUSSS)_(.*)",
+    values_to = "Value"
+  )
+
+# Plot: nested facets (Metric rows, q_in columns)
+ggplot(df_long, aes(x = Reporting, y = Value, color = Method, group = Method)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  facet_grid(Metric ~ q_in, scales = "free_y", switch = "x") +
+  scale_color_manual(values = c("Naive" = "#3b528b", "BUSSS" = "#5ec962")) +
+  scale_x_continuous(breaks = unique(df_long$Reporting)) +
+  labs(
+    x = "Reporting Rate",
+    y = "Value",
+    color = "Method",
+    title = "Simulation Results by Metric and q_in"
+  ) +
+  theme_bw(base_size = 14) +
+  theme(
+    panel.grid.minor = element_blank(),
+    strip.background = element_rect(fill = "grey90", color = NA),
+    strip.text = element_text(face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = 'bottom'
+  )
+
+```
+
+
+
+
+# Data Application
+
+## Texas COVID-19 Data {.smaller}
+
+-  COVID-19 data in early 2020 were severely under-reported due to limited testing and dificulty to diagnose (Hortaçsu, Liu, and Schwieg 2021)
+- Data (254 Counties)
+  - COVID-19 cases (Probable and Confirmed)
+  - Population
+
+![](images/confirmed_cases.png)
+![](images/population.png)
+
+## Real Data (priors) {.smaller}
+
+- Estimates from early COVID-19 studies suggest very low reporting rates ($\approx 10\%$), with low probability of exceeding 30$\%$ (Chen, Song, Stamey 2022).
+- This information results in a prior of $p \sim \text{Beta}(7, 55)$[^3]
+- Difusse priors where fit to $q_\cdot$ parameters
+
+$$ q_{all} \sim \text{gamma}() \\
+q_{out} \sim \text{gamma}() \\
+q_{in} \sim \text{gamma}() $$
+
+
+[^3]: Using `epiR` `epi.betabuster()` function.
+
+## Real Data Results {.smaller}
+
+::::{.columns}
+:::{.column width='65%'}
+
+Both methods provide different most likely clusters;
+
+- **Naive:** Around the city of Houston
+- **Under-reported:** Around El Paso and north of DFW.
+
+Bayes factors for each identified cluster is very large indicating significant evidence in favor of $H_1$ over $H_0$.
+
+![](images/results_bf.png){width='50%' fig-align='center'}
+
+:::
+:::{.column width='35%'}
+![](images/naive_res.png){width=70%}
+![](images/busss_res.png){width=70%}
+
+:::
+::::
+
+## Discussion
+
+- Traditional scan statistics may fail when case counts are under-reported, common in emerging outbreaks
+- The proposed method models reporting probability, improving cluster detection under incomplete data
+- Comparison with confirmed cases suggest some true clusters (Texas Panhandle) remain undetected, indicating further refinement is needed
+
+## Future work
+
+- Extend to spatiotemporal model for real-time detection
+- Incorporate multivariate outcomes
+- Allow spatially varying rates to reflect local testing access
+
+## Bibliography
