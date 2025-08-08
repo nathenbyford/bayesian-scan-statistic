@@ -16,6 +16,8 @@ format:
 
 # Load packages
 library(tidyverse)
+library(patchwork)
+library(tigris)
 library(ggforce)
 
 ```
@@ -184,10 +186,26 @@ $$
 
 ## Setting Priors
 
-- Neccessary to set an informative prior on reporting rate $p$
+- Necessary to set an informative prior on reporting rate $p$
     - Historical Data
     - Expert elicitation
-- Can set a disfuse prior on the $q$ parameters
+- Can set a difuse prior on the $q$ parameters
+
+## Posterior Estimation
+
+- The marginal likelihood under a candidate region $i$ is now:
+$P(D|H_1(S)) = \int \int \int P(D|q_{in}, q_{out}, p) \times \\ \quad \pi(q_{in}) \times \pi(q_{out}) \times \pi(p) dq_{in} dq_{out} dp$
+- Posterior samples are obtained through MCMC sampling in stan
+
+## Decision Making
+
+- Decision should be based on estimate of risk ratio within candidate cluster and outside.
+$$
+\widehat{RR} = \frac{\widehat{q_{in}}}{\widehat{q_{out}}}
+$$
+- Bayes factors provide evidence for alternative hypothesis
+  - calculated using bridge sampling^[Modern method to estimate marginal likelihoods based on MCMC.] in R
+- Most likely cluster selected based on largest risk ratio and Bayes factor
 
 # Simulation Study
 
@@ -195,18 +213,37 @@ $$
 
 ::::{.columns}
 :::{.column width=60%}
-- 39 counties of Washington state with an outbreak of 3 counties in south eastern Washington.
+- 39 counties of Washington state with an outbreak of 3 counties in south eastern Washington
+- Baseline values where determined by 100,000 total cases to start
+- 50 simulated data sets for each set of parameters
+  - Reporting rate: 0.1, 0.2, 0.3, 0.4, and 0.5
+  - Outbreak effect ($\Delta = q_{in} - q_{out}$): 0.15, 0.20, 0.25, 0.30, 1.0, and 3.0^[Reporting rate 0.1 only for $\Delta = 1.0$ and 5.0.]
+
 :::
 :::{.column width=40%}
 ![](images/simulation.png)
 :::
 ::::
+
+## Simulation priors {.smaller}
+
+- Priors for reporting rate $p$ where set using the betabuster tool in `epiR` package
+$$
+p \sim \text{Beta}(3.5, 23) \quad \text{if} \quad p = 0.1 \\
+p \sim \text{Beta}(4.5, 15) \quad \text{if} \quad p = 0.2 \\
+p \sim \text{Beta}(10, 22) \quad \text{if} \quad p = 0.3 \\
+p \sim \text{Beta}(13, 19) \quad \text{if} \quad p = 0.4 \\
+p \sim \text{Beta}(1, 1) \quad \text{if} \quad p = 0.5
+$$
+- Priors for $q$
+
 ## Simulation Metrics
 
 Even when the null hypothesis is correctly rejected, the detected clusters rarely match the true cluster exactly.
 
 To evaluate how well they overlap we will use:
 
+- **Power:** Proportion of detected clusters exactly match true cluster
 - **Sensitivity:** Proportion of true cases correctly included
 - **Positive Predicted Value (PPV):** Proportion of detected cases that are actually in the true cluster
 
@@ -219,31 +256,36 @@ library(tidyr)
 
 # Recreate data frame
 df <- tribble(
-  ~Reporting, ~q_in, ~Naive_Power, ~Naive_Sens, ~Naive_PPV,
+  ~Reporting, ~delta, ~Naive_Power, ~Naive_Sens, ~Naive_PPV,
   ~BUSSS_Power, ~BUSSS_Sens, ~BUSSS_PPV,
-  0.1, 2.15, 0.08, 0.25, 0.24, 0.20, 0.63, 0.55,
-  0.2, 2.15, 0.14, 0.53, 0.43, 0.33, 0.94, 0.79,
-  0.3, 2.15, 0.31, 0.72, 0.60, 0.50, 0.99, 0.83,
-  0.1, 2.20, 0.18, 0.43, 0.38, 0.43, 0.91, 0.82,
-  0.2, 2.20, 0.34, 0.70, 0.59, 0.49, 0.97, 0.84,
-  0.3, 2.20, 0.42, 0.85, 0.70, 0.58, 1.00, 0.85,
-  0.1, 2.25, 0.26, 0.65, 0.55, 0.42, 0.90, 0.80,
-  0.2, 2.25, 0.48, 0.79, 0.68, 0.70, 0.99, 0.90,
-  0.6, 2.25, 0.76, 0.93, 0.91, 0.80, 1.00, 0.92,
-  1.0, 2.25, 0.86, 1.00, 0.94, 0.86, 1.00, 0.94,
-  0.1, 2.30, 0.50, 0.86, 0.76, 0.58, 1.00, 0.85,
-  0.2, 2.30, 0.54, 0.86, 0.74, 0.68, 1.00, 0.88,
-  0.3, 2.30, 0.74, 0.99, 0.90, 0.74, 1.00, 0.90,
-  0.4, 2.30, 0.68, 1.00, 0.88, 0.80, 1.00, 0.92,
-  0.5, 2.30, 0.84, 0.99, 0.95, 0.86, 1.00, 0.95,
-  0.1, 3.00, 0.90, 1.00, 0.90, 0.90, 1.00, 0.90,
-  0.1, 5.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00
+  0.1, 0.15, 0.08, 0.25, 0.24, 0.20, 0.63, 0.55,
+  0.2, 0.15, 0.14, 0.53, 0.43, 0.33, 0.94, 0.79,
+  0.3, 0.15, 0.31, 0.72, 0.60, 0.50, 0.99, 0.83,
+  0.1, 0.20, 0.18, 0.43, 0.38, 0.43, 0.91, 0.82,
+  0.2, 0.20, 0.34, 0.70, 0.59, 0.49, 0.97, 0.84,
+  0.3, 0.20, 0.42, 0.85, 0.70, 0.58, 1.00, 0.85,
+  0.4, 0.20, 0.52, 0.91, 0.81, 0.64, 0.98, 0.88,
+  0.5, 0.20, 0.64, 0.98, 0.86, 0.72, 1.00, 0.90, 
+  0.1, 0.25, 0.26, 0.65, 0.55, 0.42, 0.90, 0.80,
+  0.2, 0.25, 0.48, 0.79, 0.68, 0.70, 0.99, 0.90,
+  0.3, 0.25, 0.66, 0.93, 0.85, 0.74, 1.00, 0.91,
+  0.4, 0.25, 0.50, 0.97, 0.82, 0.64, 0.99, 0.87,
+  0.5, 0.25, 0.62, 0.94, 0.83, 0.76, 1.00, 0.91,
+  0.6, 0.25, 0.76, 0.93, 0.91, 0.80, 1.00, 0.92,
+  1.0, 0.25, 0.86, 1.00, 0.94, 0.86, 1.00, 0.94,
+  0.1, 0.30, 0.50, 0.86, 0.76, 0.58, 1.00, 0.85,
+  0.2, 0.30, 0.54, 0.86, 0.74, 0.68, 1.00, 0.88,
+  0.3, 0.30, 0.74, 0.99, 0.90, 0.74, 1.00, 0.90,
+  0.4, 0.30, 0.68, 1.00, 0.88, 0.80, 1.00, 0.92,
+  0.5, 0.30, 0.84, 0.99, 0.95, 0.86, 1.00, 0.95,
+  0.1, 1.00, 0.90, 1.00, 0.90, 0.90, 1.00, 0.90,
+  0.1, 3.00, 1.00, 1.00, 1.00, 1.00, 1.00, 1.00
 )
 
 # Reshape data to long format
 df_long <- df %>%
   pivot_longer(
-    cols = -c(Reporting, q_in),
+    cols = -c(Reporting, delta),
     names_to = c("Method", "Metric"),
     names_pattern = "(Naive|BUSSS)_(.*)",
     values_to = "Value"
@@ -251,11 +293,11 @@ df_long <- df %>%
 
 # Plot: nested facets (Metric rows, q_in columns)
 df_long |> 
-  filter(Reporting < 1.0) |> 
+  filter(Reporting < .6) |> 
   ggplot(aes(x = Reporting, y = Value, color = Method, group = Method)) +
     geom_line(linewidth = 1) +
     geom_point(size = 2) +
-    facet_grid(Metric ~ q_in, scales = "free_y", switch = "x") +
+    facet_grid(Metric ~ delta, scales = "free_y", switch = "x") +
     scale_color_manual(values = c("Naive" = "#3b528b", "BUSSS" = "#5ec962")) +
     scale_x_continuous(breaks = unique(df_long$Reporting)) +
     labs(
@@ -326,10 +368,83 @@ df %>%
 
 ## Texas COVID-19 Data {.smaller}
 
--  COVID-19 data in early 2020 were severely under-reported due to limited testing and dificulty to diagnose (Hortaçsu, Liu, and Schwieg 2021)
+-  COVID-19 data in early 2020 were severely under-reported due to limited testing and difficulty to diagnose (Hortaçsu, Liu, and Schwieg 2021)
 - Data (254 Counties)
   - COVID-19 cases (Probable and Confirmed)
   - Population
+
+```{r}
+#| message: false
+#| include: false
+
+cases <- read_csv("data/texas_covid_2020.csv")
+population <- readxl::read_excel("data/co-est2023-pop-48.xlsx", skip = 3, n_max = 255) |> 
+  rename(
+    "County" = `...1`,
+    "April 1, 2020" = `...2`
+  ) |> 
+  filter(County != "Texas") |> 
+  mutate(
+    County = str_extract(County, "\\w+\\s\\w+"),
+    County = str_remove(County, " County")
+  ) |> 
+  select(County, `2021`) |> 
+  rename("Population" = `2021`)
+
+
+cases <- left_join(cases, population, by = join_by("County"))
+
+cases <- rename(cases, "NAME" = County)
+
+# cat("Loading Texas county data...\n")
+
+# Get Texas counties from tigris
+texas_counties <- counties("TX", cb = TRUE, year = 2020)
+
+counties <- left_join(texas_counties, cases, by = join_by(NAME))
+```
+
+```{r}
+cases <- counties |>
+  ggplot() +
+  geom_sf(aes(fill = `Probable Cases`)) +
+  theme_void() +
+  theme(
+    plot.background = element_rect(fill = "#EFEFEF", color = NA),
+    legend.position = "inside",
+    legend.position.inside = c(0.15, 0.1),
+    legend.direction = "horizontal",
+    legend.title.position = "top"
+  )
+
+population <- counties |> 
+  ggplot() +
+  geom_sf(aes(fill = Population)) +
+  theme_void() +
+  theme(
+    plot.background = element_rect(fill = "#EFEFEF", color = NA),
+    legend.position = "inside",
+    legend.position.inside = c(0.15, 0.1),
+    legend.direction = "horizontal",
+    legend.title.position = "top"
+  )
+
+per_cap <- counties |> 
+  ggplot() +
+  geom_sf(aes(fill = `Probable Cases` / Population)) +
+  scale_fill_viridis_c()  +
+  theme_void() +
+  theme(
+    plot.background = element_rect(fill = "#EFEFEF", color = NA),
+    legend.position = "inside",
+    legend.position.inside = c(0.15, 0.1),
+    legend.direction = "horizontal",
+    legend.title.position = "top"
+  )
+
+cases + population + per_cap
+```
+
 
 ::::{.columns}
 :::{.column width=30%}
