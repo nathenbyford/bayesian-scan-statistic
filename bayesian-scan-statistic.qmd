@@ -7,9 +7,11 @@ format:
     author: ' '
     footer: 'Nathen Byford'
     self-contained: true
-    toc: true
-    toc-depth: 1
     callout-appearance: simple
+    bibliography: scanstatistics.bib
+    bibliographystyle: chicago
+    nocite: |
+      @*
 ---
 ```{r}
 #| include: false
@@ -21,6 +23,13 @@ library(tigris)
 library(ggforce)
 
 ```
+
+## Table of Contents
+- Introduction
+- Proposed Method
+- Simulation Study
+- Application: Texas COVID-19 Data
+- Discussion and Conclusion
 
 # Introduction
 
@@ -98,6 +107,10 @@ $$
 - The scan statistic test statistic is $\Lambda = \max_{S \in C}\lambda(S)$.
 - Generate Monte Carlo samples under $H_0$ to calculate P-value 
 
+::: aside
+@kulldorff_spatial_1997
+:::
+
 ## Bayesian Spatial Scan Statistics {.smaller}
 
 - Assuming we observe count data $z_i$ in area $i$, each associated with baeline $b_i$
@@ -113,19 +126,23 @@ $$
 - Marginal likelihoods based on the gamma-Poisson model 
 - Conjugate model possible to solve for closed form solution
 
+::: aside
+@neill_bayesian_2005
+:::
+
 ## Bayesian Spatial Scan Statitic Testing {.smaller}
 
 - Using the maringal likelihoods from the models the posterior probability under the null is
 $$P(H_0 | D) = \frac{P(D|H_0) P(H_0)}{P(D)}$$
 - The posterior probability under the alternative is
-$$P(H_1(i) | D) = \frac{P(D|H_1{i}) P(H_1(i))}{P(D)}$$
+$$P(H_1(i) | D) = \frac{P(D|H_1(i)) P(H_1(i))}{P(D)}$$
 - Then we can return regions with non-negligible posterior probabilities
 - Since we have the full posterior probability distributions there is no need for randomization testing
-- Bayes factors can be used to provide a direct measure of evidence ofr one hypothesis over the other 
+- Bayes factors can be used to provide a direct measure of evidence for one hypothesis over the other 
 
 ## Bayesian Interpretation
 
-table: Interpretation of Bayes factor[^2]
+table: Interpretation of Bayes factor
 
 | BF        | Log(BF)      | Strength of evidence $H_0$ |
 |:----------|:-------------|:---------------------------|
@@ -134,7 +151,9 @@ table: Interpretation of Bayes factor[^2]
 | 10 to 100 | 2.30 to 4.61 | Strong                     |
 | $>$ 100   | $> 4.61$     | Decisive                   |
 
-[^2]: Kass and Raftery (1995) 
+::: aside
+Kass and Raftery (1995) 
+:::
 
 ## Scan Statistic Timeline
 
@@ -191,10 +210,28 @@ $$
     - Expert elicitation
 - Can set a difuse prior on the $q$ parameters
 
+```{r}
+#| fig-align: "center"
+
+ggplot() +
+  geom_function(fun = dgamma, args = list(shape = 1, scale = .5),
+  aes(color = "Gamma(1, 0.5)")) +
+  geom_function(fun = dgamma, args = list(shape = 1.5, scale = 1),
+  aes(color = "Gamma(1.5, 1)")) +
+  geom_function(fun = dgamma, args = list(shape = 2, scale = 0.5),
+  aes(color = "Gamma(2, 0.5)")) +
+  geom_function(fun = dgamma, args = list(shape = 3, scale = 1),
+  aes(color = "Gamma(3, 1)")) +
+  xlim(c(0, 5)) + 
+  theme_minimal() +
+  labs(title = "Diffuse Priors for q", color = "Prior")
+
+```
+
 ## Posterior Estimation
 
 - The marginal likelihood under a candidate region $i$ is now:
-$P(D|H_1(S)) = \int \int \int P(D|q_{in}, q_{out}, p) \times \\ \quad \pi(q_{in}) \times \pi(q_{out}) \times \pi(p) dq_{in} dq_{out} dp$
+$$P(D|H_1(S)) = \int \int \int P(D|q_{in}, q_{out}, p) \times \\ \quad \pi(q_{in}) \times \pi(q_{out}) \times \pi(p) dq_{in} dq_{out} dp$$
 - Posterior samples are obtained through MCMC sampling in stan
 
 ## Decision Making
@@ -236,6 +273,9 @@ p \sim \text{Beta}(13, 19) \quad \text{if} \quad p = 0.4 \\
 p \sim \text{Beta}(1, 1) \quad \text{if} \quad p = 0.5
 $$
 - Priors for $q$
+$$ q_{all} \sim \text{gamma}(2, 0.5) \\
+q_{out} \sim \text{gamma}(2, 0.4) \\
+q_{in} \sim \text{gamma}(2, 0.5) $$
 
 ## Simulation Metrics
 
@@ -261,6 +301,8 @@ df <- tribble(
   0.1, 0.15, 0.08, 0.25, 0.24, 0.20, 0.63, 0.55,
   0.2, 0.15, 0.14, 0.53, 0.43, 0.33, 0.94, 0.79,
   0.3, 0.15, 0.31, 0.72, 0.60, 0.50, 0.99, 0.83,
+  0.4, 0.15, 0.30, 0.75, 0.61, 0.52, 0.99, 0.84,
+  0.5, 0.15, 0.34, 0.75, 0.61, 0.58, 0.99, 0.85,
   0.1, 0.20, 0.18, 0.43, 0.38, 0.43, 0.91, 0.82,
   0.2, 0.20, 0.34, 0.70, 0.59, 0.49, 0.97, 0.84,
   0.3, 0.20, 0.42, 0.85, 0.70, 0.58, 1.00, 0.85,
@@ -364,11 +406,11 @@ df %>%
 
 ```
 
-# Data Application
+# Application: Texas COVID-19 Data
 
 ## Texas COVID-19 Data {.smaller}
 
--  COVID-19 data in early 2020 were severely under-reported due to limited testing and difficulty to diagnose (Hortaçsu, Liu, and Schwieg 2021)
+-  COVID-19 data in early 2020 were severely under-reported due to limited testing and difficulty to diagnose @hortacsu_estimating_2021
 - Data (254 Counties)
   - COVID-19 cases (Probable and Confirmed)
   - Population
@@ -376,6 +418,7 @@ df %>%
 ```{r}
 #| message: false
 #| include: false
+#| cache: true
 
 cases <- read_csv("data/texas_covid_2020.csv")
 population <- readxl::read_excel("data/co-est2023-pop-48.xlsx", skip = 3, n_max = 255) |> 
@@ -405,71 +448,71 @@ counties <- left_join(texas_counties, cases, by = join_by(NAME))
 ```
 
 ```{r}
+#| fig-align: "center"
+
 cases <- counties |>
   ggplot() +
-  geom_sf(aes(fill = `Probable Cases`)) +
+  geom_sf(aes(fill = `Confirmed Cases`/10000)) +
   theme_void() +
+  labs(fill = "Cases (x 10,000)") +
   theme(
     plot.background = element_rect(fill = "#EFEFEF", color = NA),
     legend.position = "inside",
-    legend.position.inside = c(0.15, 0.1),
+    legend.position.inside = c(0.2, 0.1),
     legend.direction = "horizontal",
-    legend.title.position = "top"
+    legend.title.position = "top",
+    legend.key.width = unit(10, "pt"),
+    legend.key.height = unit(5, "pt"),
+    legend.text = element_text(size = 8)
   )
 
 population <- counties |> 
   ggplot() +
-  geom_sf(aes(fill = Population)) +
+  geom_sf(aes(fill = Population / 10000)) +
   theme_void() +
+  labs(fill = "Population (x 10,000)") +
   theme(
     plot.background = element_rect(fill = "#EFEFEF", color = NA),
     legend.position = "inside",
     legend.position.inside = c(0.15, 0.1),
     legend.direction = "horizontal",
-    legend.title.position = "top"
+    legend.title.position = "top",
+    legend.key.width = unit(20, "pt"),
+    legend.key.height = unit(5, "pt"),
+    legend.text = element_text(size = 8)
   )
 
 per_cap <- counties |> 
   ggplot() +
-  geom_sf(aes(fill = `Probable Cases` / Population)) +
+  geom_sf(aes(fill = `Confirmed Cases` / Population * 10000)) +
   scale_fill_viridis_c()  +
   theme_void() +
+  labs(fill = "Confirmed cases per 10,000") +
   theme(
     plot.background = element_rect(fill = "#EFEFEF", color = NA),
     legend.position = "inside",
     legend.position.inside = c(0.15, 0.1),
     legend.direction = "horizontal",
-    legend.title.position = "top"
+    legend.title.position = "top",
+    legend.key.width = unit(20, "pt"),
+    legend.key.height = unit(5, "pt"),
+    legend.text = element_text(size = 8)
   )
 
 cases + population + per_cap
 ```
 
 
-::::{.columns}
-:::{.column width=30%}
-![](images/confirmed_cases.png){width='60%' fig-align='right'}
-:::
-:::{.column width=30%}
-![](images/population.png){width='60%' fig-align='center'}
-:::
-:::{.column width=30%}
-![](images/texas_cases.png){width='70%' fig-align='left'}
-:::
-::::
-
 ## Real Data (priors) {.smaller}
 
-- Estimates from early COVID-19 studies suggest very low reporting rates ($\approx 10\%$), with low probability of exceeding 30$\%$ (Chen, Song, Stamey 2022).
-- This information results in a prior of $p \sim \text{Beta}(7, 55)$[^3]
+- Estimates from early COVID-19 studies suggest very low reporting rates ($\approx 10\%$), with low probability of exceeding 30$\%$ @chen_bayesian_2022.
+- This information results in a prior of $p \sim \text{Beta}(7, 55)$
 - Difusse priors where fit to $q_\cdot$ parameters
 
-$$ q_{all} \sim \text{gamma}() \\
-q_{out} \sim \text{gamma}() \\
-q_{in} \sim \text{gamma}() $$
+$$ q_{all} \sim \text{gamma}(1, 0.1) \\
+q_{out} \sim \text{gamma}(1, 0.1) \\
+q_{in} \sim \text{gamma}(1, 0.1) $$
 
-
-[^3]: Using `epiR` `epi.betabuster()` function.
 <!-- Note: Try with beta(3, 15) what I actually get from epiR -->
 
 ## Real Data Results {.smaller}
@@ -506,4 +549,7 @@ Bayes factors for each identified cluster is very large indicating significant e
 - Incorporate multivariate outcomes
 - Allow spatially varying rates to reflect local testing access
 
-## Bibliography
+## Bibliography {.smaller}
+
+::: {#refs}
+:::
