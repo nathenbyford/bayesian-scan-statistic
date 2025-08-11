@@ -69,7 +69,11 @@ Examples
 Most methods proposed for modeling under-reported or misclassified data fall into two categories:
 
 1. Double sampling
-2. latent variable models
+    - Use multiple data scources to augment under/mis-reported data and reduce bias in estimating parameters
+    - Utilize two independent data collection mechanisms with different reporting characteristics
+2. Latent variable models
+    - Models that explicitly account for the reporting process itself
+    - Almost eclusively Bayesian models
 
 # Spatial Scan Statistics
 
@@ -91,6 +95,25 @@ Scan statistics
 :::
 ::::
 
+## Scan Statistic Development
+
+```{mermaid}
+timeline
+    title Spatial Scan Statistic Development
+    1965 : Conceptual basis - Naus
+    1997 : Basic Spatial Scan Statistic (Frequentist)
+    1998 : Space-Time Extension (Frequentist)
+    2005 : Flexible Shapes (Frequentist)
+    2005 : Bayesian Spatial Scan Statistic
+    2007 : Multivariate Spatial Scan Statistic (Frequentist)
+    2012 : Overdispersed data extension (Frequentist) 
+    2017 : Bayesian Spatial Scan Statistic for Zero-inflated count data
+    2018 : Wald-based Spatial Scan Statistics (Frequentist)
+    2024 : Bayesian Spatial Scan Statistic for Multinormal data
+```
+
+- Since the formalization in 1997 spatial scan statistics have been used and described as a method for epidemiologists
+- No extension to account for under-reported count data
 
 ## Frequentist Spatial Scan Statistic {.smaller}
 
@@ -140,40 +163,24 @@ $$P(H_1(i) | D) = \frac{P(D|H_1(i)) P(H_1(i))}{P(D)}$$
 - Since we have the full posterior probability distributions there is no need for randomization testing
 - Bayes factors can be used to provide a direct measure of evidence for one hypothesis over the other 
 
+::: aside
+Typicall values for probability of outbreak $H_1(S) = 0.05$ and $H_0 = 0.95$ 
+:::
+
 ## Bayesian Interpretation
 
 table: Interpretation of Bayes factor
 
-| BF        | Log(BF)      | Strength of evidence $H_0$ |
-|:----------|:-------------|:---------------------------|
-| 1 to 3.2  | 0 to 1.16    | Not Significant            |
-| 3.2 to 10 | 1.16 to 2.30 | Positive                   |
-| 10 to 100 | 2.30 to 4.61 | Strong                     |
-| $>$ 100   | $> 4.61$     | Decisive                   |
+| BF        | Log(BF)      | Strength of evidence $H_1(S)$ |
+|:----------|:-------------|:------------------------------|
+| 1 to 3.2  | 0 to 1.16    | Not Significant               |
+| 3.2 to 10 | 1.16 to 2.30 | Positive                      |
+| 10 to 100 | 2.30 to 4.61 | Strong                        |
+| $>$ 100   | $> 4.61$     | Decisive                      |
 
 ::: aside
 Kass and Raftery (1995) 
 :::
-
-## Scan Statistic Timeline
-
-```{mermaid}
-timeline
-    title Spatial Scan Statistic Development
-    1965 : Conceptual basis - Naus
-    1997 : Basic Spatial Scan Statistic (Frequentist)
-    1998 : Space-Time Extension (Frequentist)
-    2005 : Flexible Shapes (Frequentist)
-    2005 : Bayesian Spatial Scan Statistic
-    2007 : Multivariate Spatial Scan Statistic (Frequentist)
-    2012 : Overdispersed data extension (Frequentist) 
-    2017 : Bayesian Spatial Scan Statistic for Zero-inflated count data
-    2018 : Wald-based Spatial Scan Statistics (Frequentist)
-    2024 : Bayesian Spatial Scan Statistic for Multinormal data
-```
-
-- Since the formalization in 1997 spatial scan statistics have been used and described as a method for epidemiologists
-- No extension to account for under-reported count data
 
 # Proposed Method
 
@@ -228,11 +235,22 @@ ggplot() +
 
 ```
 
-## Posterior Estimation
+## Posterior Estimation {.smaller}
 
-- The marginal likelihood under a candidate region $i$ is now:
-$$P(D|H_1(S)) = \int \int \int P(D|q_{in}, q_{out}, p) \times \\ \quad \pi(q_{in}) \times \pi(q_{out}) \times \pi(p) dq_{in} dq_{out} dp$$
+- The marginal likelihood of the null hypothesis is now:
+$$
+P(D|H_0) = \int \int \pi(q_{all}) \times \pi(p) \times \prod_{i \in G} P(D|q_{all}, p, b_i) dq_{all} dp
+$$
+- The marginal likelihood under a candidate region $S$ is now:
+$$
+P(D|H_1(S)) = \int \int \pi(q_{in}) \times \pi(p) \times \prod_{i \in S} P(D|q_{in}, p, b_i) dq_{in} dp \times \\ 
+\quad \int \int \pi(q_{out}) \times \pi(p) \times \prod_{i \in S - G} P(D|q_{out}, p, b_i) dq_{out} dp
+$$
 - Posterior samples are obtained through MCMC sampling in stan
+
+::: aside
+where $G$ is the geneal set of all sets and $S$ is the subset being tested.
+:::
 
 ## Decision Making
 
@@ -275,7 +293,8 @@ $$
 - Priors for $q$
 $$ q_{all} \sim \text{gamma}(2, 0.5) \\
 q_{out} \sim \text{gamma}(2, 0.4) \\
-q_{in} \sim \text{gamma}(2, 0.5) $$
+q_{in} \sim \text{gamma}(2, 0.5) 
+$$
 
 ## Simulation Metrics
 
@@ -511,7 +530,8 @@ cases + population + per_cap
 
 $$ q_{all} \sim \text{gamma}(1, 0.1) \\
 q_{out} \sim \text{gamma}(1, 0.1) \\
-q_{in} \sim \text{gamma}(1, 0.1) $$
+q_{in} \sim \text{gamma}(1, 0.1) 
+$$
 
 <!-- Note: Try with beta(3, 15) what I actually get from epiR -->
 
@@ -553,3 +573,28 @@ Bayes factors for each identified cluster is very large indicating significant e
 
 ::: {#refs}
 :::
+
+# Thank you!
+
+## Appendix: MCMC convergence (Sim)
+
+::: {.columns}
+::: {.column}
+![Null model from simulation](images/mcmc_null_sim.png)
+:::
+::: {.column}
+![Alternative model from simulation](images/mcmc_alt_sim.png)
+:::
+::: 
+
+## Appendix: MCMC convergence (COVID-19)
+
+
+
+## Appendix: Null Hypothesis {.smaller}
+
+$$
+P(D|H_0) \approx \frac{\beta_{all}^{\alpha_{all}}}{\Gamma(\alpha_{all}) \mathcal{B}(\alpha, \beta)} \int \int q_{all}^{\alpha_{all} + C - 1} p^{\alpha + C - 1} (1 - p)^{\beta - 1} e^{-q_{all}\beta_{all} - p q_{all} B} dp dq_all
+$$
+
+## Appendix: Alternative Hypothesis
