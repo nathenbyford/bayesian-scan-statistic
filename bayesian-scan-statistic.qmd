@@ -569,12 +569,12 @@ Bayes factors for each identified cluster is very large indicating significant e
 - Incorporate multivariate outcomes
 - Allow spatially varying rates to reflect local testing access
 
+# Thank you!
+
 ## Bibliography {.smaller}
 
 ::: {#refs}
 :::
-
-# Thank you!
 
 ## Appendix: MCMC convergence (Sim)
 
