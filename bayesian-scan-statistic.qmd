@@ -139,7 +139,7 @@ $$
 - Assuming we observe count data $z_i$ in area $i$, each associated with baeline $b_i$
 - Under the null hypothesis there is no cluster and all locations share $q_{all}$
 $$ z_i \sim \text{Poisson}(q_{all} b_i), \quad q_{all} \sim \text{Beta}(\alpha_{all}, \beta_{all})$$
-- The alternative hypothesis for each candidate cluster $i \in \mathcal{S}$, where $\mathcal{S}$ is the space of all possible clusters
+- The alternative hypothesis for each candidate cluster $S \in \mathcal{S}$, where $\mathcal{S}$ is the space of all possible clusters
 $$
 \begin{cases}
     z_i \sim \text{Poisson}(q_{in} b_i), &i \in S, \quad q_{in} \sim \text{Gamma}(\alpha_{in}, \beta_{in}), \\
@@ -158,7 +158,7 @@ $$
 - Using the maringal likelihoods from the models the posterior probability under the null is
 $$P(H_0 | D) = \frac{P(D|H_0) P(H_0)}{P(D)}$$
 - The posterior probability under the alternative is
-$$P(H_1(i) | D) = \frac{P(D|H_1(i)) P(H_1(i))}{P(D)}$$
+$$P(H_1(S) | D) = \frac{P(D|H_1(S)) P(H_1(S))}{P(D)}$$
 - Then we can return regions with non-negligible posterior probabilities
 - Since we have the full posterior probability distributions there is no need for randomization testing
 - Bayes factors can be used to provide a direct measure of evidence for one hypothesis over the other 
