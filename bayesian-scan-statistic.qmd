@@ -50,7 +50,7 @@ Public health surveillance
 
 ## Outbreak Detection
 
-A subset of disease surveillance methods focus on disease progression and outbreak detection.
+A subset of disease surveillance methods focus on disease progression and identifying hotspots.
 
 :::{.callout-warning}
 ## Novel disease monitoring
@@ -118,7 +118,7 @@ timeline
 ## Frequentist Spatial Scan Statistic {.smaller}
 
 - The framework assumes that we observe counts $z_i$ such that $z_i \sim \text{Poisson}(qb_i)$
-  - Where $b_i$ represents the known baseline/at risk population of cell $S_i$
+  - Where $b_i$ represents the known baseline/at risk population of location $i$
   - $q$ is the unknown underlying disease rate
 
 $$ 
@@ -138,7 +138,7 @@ $$
 
 - Assuming we observe count data $z_i$ in area $i$, each associated with baeline $b_i$
 - Under the null hypothesis there is no cluster and all locations share $q_{all}$
-$$ z_i \sim \text{Poisson}(q_{all} b_i), \quad q_{all} \sim \text{Beta}(\alpha_{all}, \beta_{all})$$
+$$ z_i \sim \text{Poisson}(q_{all} b_i), \quad q_{all} \sim \text{gamma}(\alpha_{all}, \beta_{all})$$
 - The alternative hypothesis for each candidate cluster $S \in \mathcal{S}$, where $\mathcal{S}$ is the space of all possible clusters
 $$
 \begin{cases}
@@ -272,7 +272,7 @@ $$
 - Baseline values where determined by 100,000 total cases to start
 - 50 simulated data sets for each set of parameters
   - Reporting rate: 0.1, 0.2, 0.3, 0.4, and 0.5
-  - Outbreak effect ($\Delta = q_{in} - q_{out}$): 0.15, 0.20, 0.25, 0.30, 1.0, and 3.0^[Reporting rate 0.1 only for $\Delta = 1.0$ and 5.0.]
+  - Outbreak effect ($\Delta = q_{in} - q_{out}$): 0.15, 0.20, 0.25, 0.30, 1.0, and 3.0^[Reporting rate 0.1 only for $\Delta = 1.0$ and 3.0.]
 
 :::
 :::{.column width=40%}
