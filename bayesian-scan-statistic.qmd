@@ -580,21 +580,37 @@ Bayes factors for each identified cluster is very large indicating significant e
 
 ::: {.columns}
 ::: {.column}
-![Null model from simulation](images/mcmc_null_sim.png)
+![Null samples from simulation](images/mcmc_null_sim.png)
 :::
 ::: {.column}
-![Alternative model from simulation](images/mcmc_alt_sim.png)
+![Alternative samples from simulation](images/mcmc_alt_sim.png)
 :::
 ::: 
 
 ## Appendix: MCMC convergence (COVID-19)
 
+::: {.columns}
+::: {.column}
+![Null samples from simulation](images/mcmc_null_tx.png)
+:::
+::: {.column}
+![Alternative samples from simulation](images/mcmc_alt_tx.png)
+:::
+::: 
 
 
-## Appendix: Null Hypothesis {.smaller}
+## Appendix: Equations {.smaller}
 
 $$
-P(D|H_0) \approx \frac{\beta_{all}^{\alpha_{all}}}{\Gamma(\alpha_{all}) \mathcal{B}(\alpha, \beta)} \int \int q_{all}^{\alpha_{all} + C - 1} p^{\alpha + C - 1} (1 - p)^{\beta - 1} e^{-q_{all}\beta_{all} - p q_{all} B} dp dq_all
+P(D|H_0) \propto \frac{\beta_{all}^{\alpha_{all}}}{\Gamma(\alpha_{all}) \mathcal{B}(\alpha, \beta)} \int \int q_{all}^{\alpha_{all} + C - 1} p^{\alpha + C - 1} (1 - p)^{\beta - 1} e^{-q_{all}\beta_{all} - p q_{all} B} dp dq_{all}
+$$
+$$
+P(D|H_1(S)) \propto \frac{\beta_{in}^{\alpha_{in}}}{\Gamma(\alpha_{in}) \mathcal{B}(\alpha, \beta)} \int \int q_{in}^{\alpha_{in} + C_S - 1} p^{\alpha + C_S - 1} (1 - p)^{\beta - 1} e^{-q_{in}\beta_{in} - p q_{in} B_S} dp dq_{in} \times \\
+\quad \frac{\beta_{out}^{\alpha_{out}}}{\Gamma(\alpha_{out}) \mathcal{B}(\alpha, \beta)} \int \int q_{out}^{\alpha_{out} + C_{S-G} - 1} p^{\alpha + C_{S-G} - 1} (1 - p)^{\beta - 1} e^{-q_{out}\beta_{out} - p q_{out} B_{S-G}} dp dq_{out}
 $$
 
-## Appendix: Alternative Hypothesis
+$$
+P(D) = P(D|H_0) P(H_0) + \sum_{s_i \in G} P(D|H_1(S)) P(H_1(S))
+$$
+
+
