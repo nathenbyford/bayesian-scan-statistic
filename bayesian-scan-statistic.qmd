@@ -525,15 +525,14 @@ cases + population + per_cap
 ## Real Data (priors) {.smaller}
 
 - Estimates from early COVID-19 studies suggest very low reporting rates ($\approx 10\%$), with low probability of exceeding 30$\%$ @chen_bayesian_2022.
-- This information results in a prior of $p \sim \text{Beta}(7, 55)$
+- This information results in a prior of $p \sim \text{Beta}(3.5, 23)$
 - Diffuse priors where fit to $q_\cdot$ parameters
 
-$$ q_{all} \sim \text{gamma}(1, 0.1) \\
-q_{out} \sim \text{gamma}(1, 0.1) \\
-q_{in} \sim \text{gamma}(1, 0.1) 
+$$ q_{all} \sim \text{gamma}(1.5, 1) \\
+q_{out} \sim \text{gamma}(1.5, 1) \\
+q_{in} \sim \text{gamma}(1.5, 1) 
 $$
 
-<!-- Note: Try with beta(3, 15) what I actually get from epiR -->
 
 ## Real Data Results {.smaller}
 
@@ -543,11 +542,48 @@ $$
 Both methods provide different most likely clusters;
 
 - **Naive:** Around the city of Houston
-- **Under-reported:** Around El Paso and north of DFW.
+- **Under-reported:** Around El Paso and Texas panhandle.
 
 Bayes factors for each identified cluster is very large indicating significant evidence in favor of $H_1$ over $H_0$.
 
-![](images/results_bf.png){width='50%' fig-align='center'}
+```{R}
+library(gt)
+
+df <- tribble(
+  ~Method,            ~log_BF,   ~RR,
+  "Naive 1",           875698.5,   NA_real_,
+  "Under-reported 1",     713.95,   3.06,
+  "Under-reported 2",     292.78,   2.71
+)
+
+df %>%
+  gt() %>%
+  cols_label(
+    Method = "Method",
+    log_BF = html("log BF"),
+    RR     = "RR"
+  ) %>%
+  fmt_number(
+    columns = log_BF,
+    decimals = 1,      # show one decimal like the photo
+    use_seps = TRUE    # adds thousands separators
+  ) %>%
+  fmt_number(
+    columns = RR,
+    decimals = 2
+  ) %>%
+  # Put a superscript footnote marker on the NA in RR for Naive 1
+  text_transform(
+    locations = cells_body(rows = Method == "Naive 1", columns = RR),
+    fn = function(x) ifelse(is.na(x), html("NA<sup>1</sup>"), x)
+  ) %>%
+  tab_footnote(
+    footnote = md("Not provided in output from `ScanStatistic` package."),
+    locations = cells_body(rows = Method == "Naive 1", columns = RR)
+  ) %>%
+  tab_options(table.font.names = "Helvetica", data_row.padding = px(6))
+
+```
 
 :::
 :::{.column width='35%'}
@@ -559,9 +595,11 @@ Bayes factors for each identified cluster is very large indicating significant e
 
 ## Discussion
 
-- Traditional scan statistics may fail when case counts are under-reported, common in emerging outbreaks
+- Traditional scan statistics may fail when case counts are under-reported
 - The proposed method models reporting probability, improving cluster detection under incomplete data
-- Comparison with confirmed cases suggest some true clusters (Texas Panhandle) remain undetected, indicating further refinement is needed
+- In simulation study and real data example the proposed method outperforms the naive Bayesian scan statistic
+- The proposed method performs significantly better when the effect is small and reporting is low
+    - Given an informative prior is available and reasonable
 
 ## Future work
 
@@ -598,6 +636,25 @@ Bayes factors for each identified cluster is very large indicating significant e
 :::
 ::: 
 
+## Appendix: Priors
+
+```{R}
+p <- ggplot() +
+  geom_function(fun = dbeta, args = list(shape1 = 3.5, shape2 = 23), aes(color = "0.1")) +
+  geom_function(fun = dbeta, args = list(shape1 = 4.5, shape2 = 15), aes(color = "0.2")) +
+  geom_function(fun = dbeta, args = list(shape1 = 10, shape2 = 22), aes(color = "0.3")) +
+  geom_function(fun = dbeta, args = list(shape1 = 13, shape2 = 19), aes(color = "0.4")) +
+  geom_function(fun = dbeta, args = list(shape1 = 2, shape2 = 2), aes(color = "0.5")) +
+  xlim(c(0, 1)) +
+  labs(title = "Prior Distribution on p", color = "True p")
+
+q <- ggplot() +
+  geom_function(fun = dgamma, args = list(shape = 2, scale = 0.5), aes(color = "q in and q all")) +
+  geom_function(fun = dgamma, args = list(shape = 2, scale = 0.4), aes(color = "q out")) +
+  geom_function(fun = dgamma, args = list(shape = 1.5, scale = 1), aes(color = "q COVID")) +
+  xlim(c(0, 5)) +
+  labs(title = "Prior Distribution on q", color = "Parameter")
+```
 
 ## Appendix: Equations {.smaller}
 
