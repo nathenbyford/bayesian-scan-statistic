@@ -136,7 +136,7 @@ $$
 
 ## Bayesian Spatial Scan Statistics {.smaller}
 
-- Assuming we observe count data $z_i$ in area $i$, each associated with baeline $b_i$
+- Assuming we observe count data $z_i$ in area $i$, each associated with baseline $b_i$
 - Under the null hypothesis there is no cluster and all locations share $q_{all}$
 $$ z_i \sim \text{Poisson}(q_{all} b_i), \quad q_{all} \sim \text{gamma}(\alpha_{all}, \beta_{all})$$
 - The alternative hypothesis for each candidate cluster $S \in \mathcal{S}$, where $\mathcal{S}$ is the space of all possible clusters
@@ -197,11 +197,11 @@ $$
 
 ## Bayesian Spatial Scan Statistic Extension {.smaller}
 
-- The new null hypothesys assumes no clusters
+- The new null hypotheses assumes no clusters
 $$
 z_i \sim \text{Poisson}(p \times q_{all} \times b_i), \quad q_{all} \sim \text{gamma}(\alpha_{all}, \beta_{all}), \quad p \sim \text{beta}(\alpha, \beta)
 $$
-- The resulting alternative hypothesys for region $i$ is
+- The resulting alternative hypotheses for candidate region $S$ is
 $$
 \begin{cases}
     z_i \sim \text{Poisson}(p \times q_{in} \times b_i), &i \in S, \quad q_{in} \sim \text{Gamma}(\alpha_{in}, \beta_{in}), \\
@@ -215,7 +215,7 @@ $$
 - Necessary to set an informative prior on reporting rate $p$
     - Historical Data
     - Expert elicitation
-- Can set a difuse prior on the $q$ parameters
+- Can set a diffuse prior on the $q$ parameters
 
 ```{r}
 #| fig-align: "center"
@@ -526,7 +526,7 @@ cases + population + per_cap
 
 - Estimates from early COVID-19 studies suggest very low reporting rates ($\approx 10\%$), with low probability of exceeding 30$\%$ @chen_bayesian_2022.
 - This information results in a prior of $p \sim \text{Beta}(7, 55)$
-- Difusse priors where fit to $q_\cdot$ parameters
+- Diffuse priors where fit to $q_\cdot$ parameters
 
 $$ q_{all} \sim \text{gamma}(1, 0.1) \\
 q_{out} \sim \text{gamma}(1, 0.1) \\
